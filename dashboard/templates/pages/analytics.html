@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block title %}Аналитика - zeroESTATE{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">Аналитика</h2>
+
+<!-- Liquidity insights -->
+<div class="bg-gray-800 rounded-lg shadow p-5 mb-6 border border-indigo-500/30">
+    <h3 class="text-lg font-semibold text-indigo-400 mb-3">Критерии ликвидности коммерческой недвижимости</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm text-gray-300">
+        <div class="flex items-start gap-2">
+            <span class="text-indigo-400 mt-0.5">&#9679;</span>
+            <span>Цена за м&sup2; ниже средней по району &mdash; потенциально недооценённый объект</span>
+        </div>
+        <div class="flex items-start gap-2">
+            <span class="text-indigo-400 mt-0.5">&#9679;</span>
+            <span>1 этаж &mdash; наиболее ликвиден для ритейла</span>
+        </div>
+        <div class="flex items-start gap-2">
+            <span class="text-indigo-400 mt-0.5">&#9679;</span>
+            <span>Близость к метро (< 10 мин) &mdash; выше ликвидность</span>
+        </div>
+        <div class="flex items-start gap-2">
+            <span class="text-indigo-400 mt-0.5">&#9679;</span>
+            <span>Крупный застройщик &mdash; надёжность и узнаваемость</span>
+        </div>
+        <div class="flex items-start gap-2">
+            <span class="text-indigo-400 mt-0.5">&#9679;</span>
+            <span>Стабильная или растущая динамика цен &mdash; перспективный район</span>
+        </div>
+        <div class="flex items-start gap-2">
+            <span class="text-indigo-400 mt-0.5">&#9679;</span>
+            <span>Площадь 50-200 м&sup2; &mdash; самый ликвидный диапазон</span>
+        </div>
+    </div>
+</div>
+
+<!-- Charts row 1 -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="bg-gray-800 rounded-lg shadow p-5">
+        <h3 class="text-base font-semibold mb-3">Средняя цена за м&sup2; по застройщикам</h3>
+        <div style="height: 300px;"><canvas id="avgPriceChart"></canvas></div>
+    </div>
+    <div class="bg-gray-800 rounded-lg shadow p-5">
+        <h3 class="text-base font-semibold mb-3">Динамика цен за м&sup2; (30 дней)</h3>
+        <div style="height: 300px;"><canvas id="priceTrendChart"></canvas></div>
+    </div>
+</div>
+
+<!-- Charts row 2 -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="bg-gray-800 rounded-lg shadow p-5">
+        <h3 class="text-base font-semibold mb-3">Объекты по типам</h3>
+        <div style="height: 300px;"><canvas id="byTypeChart"></canvas></div>
+    </div>
+    <div class="bg-gray-800 rounded-lg shadow p-5">
+        <h3 class="text-base font-semibold mb-3">Новые и снятые объекты (30 дней)</h3>
+        <div style="height: 300px;"><canvas id="newRemovedChart"></canvas></div>
+    </div>
+</div>
+
+<!-- Charts row 3 -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="bg-gray-800 rounded-lg shadow p-5">
+        <h3 class="text-base font-semibold mb-3">Топ-20 районов по количеству объектов</h3>
+        <div style="height: 400px;"><canvas id="byDistrictChart"></canvas></div>
+    </div>
+    <div class="bg-gray-800 rounded-lg shadow p-5">
+        <h3 class="text-base font-semibold mb-3">Топ-20 станций метро</h3>
+        <div style="height: 400px;"><canvas id="byMetroChart"></canvas></div>
+    </div>
+</div>
+
+<!-- Liquidity ranking -->
+<div class="bg-gray-800 rounded-lg shadow overflow-hidden mb-6">
+    <div class="px-5 py-4 border-b border-gray-700">
+        <h3 class="text-lg font-semibold">Рейтинг ликвидности (топ-50)</h3>
+        <p class="text-xs text-gray-400 mt-1">Объекты отсортированы по совокупному баллу ликвидности</p>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm" id="liquidityTable">
+            <thead>
+                <tr class="border-b border-gray-700">
+                    <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Балл</th>
+                    <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Застройщик</th>
+                    <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Проект</th>
+                    <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Район</th>
+                    <th class="text-right px-4 py-2.5 text-gray-400 font-medium">Площадь</th>
+                    <th class="text-right px-4 py-2.5 text-gray-400 font-medium">Цена/м&sup2;</th>
+                    <th class="text-right px-4 py-2.5 text-gray-400 font-medium">Этаж</th>
+                    <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Метро</th>
+                    <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Факторы</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700" id="liquidityBody">
+                <tr><td colspan="9" class="px-4 py-8 text-center text-gray-500">Загрузка...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const COLORS = ['#818cf8','#34d399','#fbbf24','#f87171','#a78bfa','#fb923c','#38bdf8','#e879f9','#4ade80','#f472b6'];
+const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#9ca3af' } } },
+    scales: {
+        x: { ticks: { color: '#6b7280' }, grid: { color: '#374151' } },
+        y: { ticks: { color: '#6b7280' }, grid: { color: '#374151' } }
+    }
+};
+
+function fmtPrice(v) { return v ? (v/1000).toFixed(0) + ' тыс' : ''; }
+
+// Avg price by source
+fetch('/api/analytics/avg-price-by-source').then(r=>r.json()).then(data => {
+    new Chart(document.getElementById('avgPriceChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: 'Ср. цена/м\u00b2',
+                data: data.values,
+                backgroundColor: COLORS.slice(0, data.labels.length),
+            }]
+        },
+        options: {
+            ...chartDefaults,
+            plugins: { ...chartDefaults.plugins, legend: { display: false } },
+            scales: {
+                ...chartDefaults.scales,
+                y: { ...chartDefaults.scales.y, ticks: { ...chartDefaults.scales.y.ticks, callback: v => fmtPrice(v) } }
+            }
+        }
+    });
+});
+
+// Price trend
+fetch('/api/analytics/price-trend').then(r=>r.json()).then(data => {
+    new Chart(document.getElementById('priceTrendChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: data.datasets.map((ds, i) => ({
+                label: ds.label,
+                data: ds.data,
+                borderColor: COLORS[i % COLORS.length],
+                fill: false,
+                tension: 0.3,
+                pointRadius: 2,
+            }))
+        },
+        options: {
+            ...chartDefaults,
+            scales: {
+                ...chartDefaults.scales,
+                y: { ...chartDefaults.scales.y, ticks: { ...chartDefaults.scales.y.ticks, callback: v => fmtPrice(v) } }
+            }
+        }
+    });
+});
+
+// By type
+fetch('/api/analytics/by-type').then(r=>r.json()).then(data => {
+    new Chart(document.getElementById('byTypeChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                data: data.values,
+                backgroundColor: COLORS.slice(0, data.labels.length),
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'right', labels: { color: '#9ca3af' } } }
+        }
+    });
+});
+
+// New vs removed
+fetch('/api/analytics/new-removed-trend').then(r=>r.json()).then(data => {
+    new Chart(document.getElementById('newRemovedChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: data.labels,
+            datasets: [
+                { label: 'Новые', data: data.new, backgroundColor: '#34d399' },
+                { label: 'Снятые', data: data.removed, backgroundColor: '#f87171' },
+            ]
+        },
+        options: chartDefaults
+    });
+});
+
+// By district
+fetch('/api/analytics/by-district').then(r=>r.json()).then(data => {
+    new Chart(document.getElementById('byDistrictChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: data.labels,
+            datasets: [{ label: 'Объектов', data: data.values, backgroundColor: '#818cf8' }]
+        },
+        options: {
+            ...chartDefaults,
+            indexAxis: 'y',
+            plugins: { ...chartDefaults.plugins, legend: { display: false } }
+        }
+    });
+});
+
+// By metro
+fetch('/api/analytics/by-metro').then(r=>r.json()).then(data => {
+    new Chart(document.getElementById('byMetroChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: data.labels,
+            datasets: [{ label: 'Объектов', data: data.values, backgroundColor: '#38bdf8' }]
+        },
+        options: {
+            ...chartDefaults,
+            indexAxis: 'y',
+            plugins: { ...chartDefaults.plugins, legend: { display: false } }
+        }
+    });
+});
+
+// Liquidity scores
+fetch('/api/analytics/liquidity-scores').then(r=>r.json()).then(data => {
+    const tbody = document.getElementById('liquidityBody');
+    if (!data.items || data.items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-500">Нет данных для анализа</td></tr>';
+        return;
+    }
+    tbody.innerHTML = data.items.map(item => {
+        const scoreColor = item.score >= 6 ? 'text-green-400' : item.score >= 4 ? 'text-yellow-400' : 'text-gray-400';
+        const priceFmt = item.price_per_sqm ? Number(item.price_per_sqm).toLocaleString('ru-RU') + ' \u20bd' : '\u2014';
+        const areaFmt = item.area ? item.area.toFixed(1) + ' \u043c\u00b2' : '\u2014';
+        const metroFmt = item.metro_station ? item.metro_station + (item.metro_distance_min ? ' (' + item.metro_distance_min + ' \u043c\u0438\u043d)' : '') : '\u2014';
+        return `<tr class="hover:bg-gray-750 cursor-pointer" onclick="window.location='/properties/${item.property_id}'">
+            <td class="px-4 py-2.5 ${scoreColor} font-bold text-lg">${item.score}</td>
+            <td class="px-4 py-2.5"><span class="text-xs px-2 py-0.5 rounded bg-gray-700">${item.source_name}</span></td>
+            <td class="px-4 py-2.5 text-white font-medium">${item.project_name || '\u2014'}</td>
+            <td class="px-4 py-2.5 text-gray-300">${item.district || '\u2014'}</td>
+            <td class="px-4 py-2.5 text-right text-gray-300">${areaFmt}</td>
+            <td class="px-4 py-2.5 text-right text-indigo-400 font-medium">${priceFmt}</td>
+            <td class="px-4 py-2.5 text-right text-gray-300">${item.floor || '\u2014'}</td>
+            <td class="px-4 py-2.5 text-gray-300">${metroFmt}</td>
+            <td class="px-4 py-2.5 text-xs text-gray-400">${item.reasons.join(', ')}</td>
+        </tr>`;
+    }).join('');
+});
+</script>
+{% endblock %}

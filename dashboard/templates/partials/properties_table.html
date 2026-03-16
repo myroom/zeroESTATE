@@ -1,0 +1,129 @@
+<div id="properties-table">
+    <div class="bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div class="px-5 py-3 border-b border-gray-700 flex items-center justify-between">
+            <span class="text-sm text-gray-400">Найдено: <strong class="text-white">{{ total_count }}</strong></span>
+            <span class="text-sm text-gray-400">
+                Стр. {{ page }} из {{ total_pages }}
+            </span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-gray-700">
+                        <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Источник</th>
+                        <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Проект</th>
+                        <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Адрес</th>
+                        <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Тип</th>
+                        <th class="text-right px-4 py-2.5 text-gray-400 font-medium">
+                            <a href="?sort=area&order={% if sort == 'area' and order == 'asc' %}desc{% else %}asc{% endif %}&source={{ filters.source }}&property_type={{ filters.property_type }}"
+                               class="hover:text-white cursor-pointer">
+                                Площадь {% if sort == 'area' %}{% if order == 'asc' %}&#9650;{% else %}&#9660;{% endif %}{% endif %}
+                            </a>
+                        </th>
+                        <th class="text-right px-4 py-2.5 text-gray-400 font-medium">
+                            <a href="?sort=price&order={% if sort == 'price' and order == 'asc' %}desc{% else %}asc{% endif %}&source={{ filters.source }}&property_type={{ filters.property_type }}"
+                               class="hover:text-white cursor-pointer">
+                                Цена {% if sort == 'price' %}{% if order == 'asc' %}&#9650;{% else %}&#9660;{% endif %}{% endif %}
+                            </a>
+                        </th>
+                        <th class="text-right px-4 py-2.5 text-gray-400 font-medium">
+                            <a href="?sort=price_per_sqm&order={% if sort == 'price_per_sqm' and order == 'asc' %}desc{% else %}asc{% endif %}&source={{ filters.source }}&property_type={{ filters.property_type }}"
+                               class="hover:text-white cursor-pointer">
+                                Цена/м&sup2; {% if sort == 'price_per_sqm' %}{% if order == 'asc' %}&#9650;{% else %}&#9660;{% endif %}{% endif %}
+                            </a>
+                        </th>
+                        <th class="text-right px-4 py-2.5 text-gray-400 font-medium">
+                            <a href="?sort=floor&order={% if sort == 'floor' and order == 'asc' %}desc{% else %}asc{% endif %}&source={{ filters.source }}&property_type={{ filters.property_type }}"
+                               class="hover:text-white cursor-pointer">
+                                Этаж {% if sort == 'floor' %}{% if order == 'asc' %}&#9650;{% else %}&#9660;{% endif %}{% endif %}
+                            </a>
+                        </th>
+                        <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Метро</th>
+                        <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Обновлено</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    {% for item in items %}
+                    <tr class="hover:bg-gray-750 transition-colors cursor-pointer"
+                        onclick="window.location='/properties/{{ item.property.id }}'">
+                        <td class="px-4 py-2.5">
+                            <span class="text-xs font-medium px-2 py-0.5 rounded bg-gray-700 text-gray-300">{{ item.source.name }}</span>
+                        </td>
+                        <td class="px-4 py-2.5 text-white font-medium max-w-[200px] truncate">{{ item.snapshot.project_name or '&mdash;' }}</td>
+                        <td class="px-4 py-2.5 text-gray-300 max-w-[200px] truncate">{{ item.snapshot.address or '&mdash;' }}</td>
+                        <td class="px-4 py-2.5 text-gray-300">{{ item.snapshot.property_type or '&mdash;' }}</td>
+                        <td class="px-4 py-2.5 text-right text-gray-300">
+                            {% if item.snapshot.area %}{{ "%.1f"|format(item.snapshot.area) }} м&sup2;{% else %}&mdash;{% endif %}
+                        </td>
+                        <td class="px-4 py-2.5 text-right text-white font-medium">
+                            {% if item.snapshot.price_value %}
+                                {{ "{:,}".format(item.snapshot.price_value).replace(",", " ") }} &#8381;
+                            {% else %}
+                                {{ item.snapshot.price or '&mdash;' }}
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2.5 text-right text-indigo-400 font-medium">
+                            {% if item.snapshot.price_per_sqm %}
+                                {{ "{:,}".format(item.snapshot.price_per_sqm).replace(",", " ") }} &#8381;
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2.5 text-right text-gray-300">
+                            {% if item.snapshot.floor %}{{ item.snapshot.floor }}{% if item.snapshot.floor_total %}/{{ item.snapshot.floor_total }}{% endif %}{% else %}&mdash;{% endif %}
+                        </td>
+                        <td class="px-4 py-2.5 text-gray-300 max-w-[150px] truncate">
+                            {% if item.snapshot.metro_station %}
+                                {{ item.snapshot.metro_station }}
+                                {% if item.snapshot.metro_distance_min %}
+                                    <span class="text-xs text-gray-500">({{ item.snapshot.metro_distance_min }} мин)</span>
+                                {% endif %}
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2.5 text-gray-400 text-xs">
+                            {{ item.property.last_seen.strftime("%d.%m %H:%M") if item.property.last_seen else '&mdash;' }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not items %}
+                    <tr>
+                        <td colspan="10" class="px-4 py-8 text-center text-gray-500">Объекты не найдены</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <div class="px-5 py-3 border-t border-gray-700 flex items-center justify-center gap-2">
+            {% if page > 1 %}
+            <a href="?page={{ page - 1 }}&sort={{ sort }}&order={{ order }}&source={{ filters.source }}&property_type={{ filters.property_type }}&min_area={{ filters.min_area }}&max_area={{ filters.max_area }}&min_price={{ filters.min_price }}&max_price={{ filters.max_price }}&district={{ filters.district }}&metro={{ filters.metro }}"
+               class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-sm transition-colors">
+                &laquo; Назад
+            </a>
+            {% endif %}
+
+            {% for p in range(1, total_pages + 1) %}
+                {% if p == page %}
+                    <span class="px-3 py-1 rounded bg-indigo-600 text-white text-sm">{{ p }}</span>
+                {% elif p <= 3 or p > total_pages - 3 or (p >= page - 2 and p <= page + 2) %}
+                    <a href="?page={{ p }}&sort={{ sort }}&order={{ order }}&source={{ filters.source }}&property_type={{ filters.property_type }}&min_area={{ filters.min_area }}&max_area={{ filters.max_area }}&min_price={{ filters.min_price }}&max_price={{ filters.max_price }}&district={{ filters.district }}&metro={{ filters.metro }}"
+                       class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-sm transition-colors">{{ p }}</a>
+                {% elif p == 4 or p == total_pages - 3 %}
+                    <span class="text-gray-500">...</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if page < total_pages %}
+            <a href="?page={{ page + 1 }}&sort={{ sort }}&order={{ order }}&source={{ filters.source }}&property_type={{ filters.property_type }}&min_area={{ filters.min_area }}&max_area={{ filters.max_area }}&min_price={{ filters.min_price }}&max_price={{ filters.max_price }}&district={{ filters.district }}&metro={{ filters.metro }}"
+               class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-sm transition-colors">
+                Далее &raquo;
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>

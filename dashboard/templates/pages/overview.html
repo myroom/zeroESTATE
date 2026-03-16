@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Обзор - zeroESTATE{% endblock %}
+
+{% block content %}
+<div hx-get="/" hx-trigger="every 60s" hx-select="#overview-content" hx-target="#overview-content" hx-swap="outerHTML">
+<div id="overview-content">
+    <h2 class="text-2xl font-bold mb-6">Обзор</h2>
+
+    <!-- Summary cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-gray-800 rounded-lg shadow p-5">
+            <p class="text-sm text-gray-400">Всего объектов</p>
+            <p class="text-3xl font-bold text-white mt-1">{{ total_properties }}</p>
+        </div>
+        <div class="bg-gray-800 rounded-lg shadow p-5">
+            <p class="text-sm text-gray-400">Активных</p>
+            <p class="text-3xl font-bold text-indigo-400 mt-1">{{ total_active }}</p>
+        </div>
+        <div class="bg-gray-800 rounded-lg shadow p-5">
+            <p class="text-sm text-gray-400">Новых сегодня</p>
+            <p class="text-3xl font-bold text-green-400 mt-1">+{{ new_today }}</p>
+        </div>
+        <div class="bg-gray-800 rounded-lg shadow p-5">
+            <p class="text-sm text-gray-400">Снято сегодня</p>
+            <p class="text-3xl font-bold text-red-400 mt-1">-{{ removed_today }}</p>
+        </div>
+    </div>
+
+    <!-- Sources table -->
+    <div class="bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-700">
+            <h3 class="text-lg font-semibold">Источники</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-750">
+                    <tr class="border-b border-gray-700">
+                        <th class="text-left px-5 py-3 text-gray-400 font-medium">Застройщик</th>
+                        <th class="text-left px-5 py-3 text-gray-400 font-medium">Метод</th>
+                        <th class="text-right px-5 py-3 text-gray-400 font-medium">Активных</th>
+                        <th class="text-right px-5 py-3 text-gray-400 font-medium">Ср. цена/м&sup2;</th>
+                        <th class="text-left px-5 py-3 text-gray-400 font-medium">Последний запуск</th>
+                        <th class="text-left px-5 py-3 text-gray-400 font-medium">Статус</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    {% for item in source_stats %}
+                    <tr class="hover:bg-gray-750 transition-colors">
+                        <td class="px-5 py-3">
+                            <span class="font-medium text-white">{{ item.source.name }}</span>
+                            <span class="text-xs text-gray-500 ml-2">{{ item.source.slug }}</span>
+                        </td>
+                        <td class="px-5 py-3">
+                            {% if 'REST API' in item.method %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-900 text-blue-300">{{ item.method }}</span>
+                            {% elif 'прокси' in item.method %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-900 text-orange-300">{{ item.method }}</span>
+                            {% elif 'Playwright' in item.method %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-900 text-purple-300">{{ item.method }}</span>
+                            {% else %}
+                                <span class="text-gray-500">{{ item.method }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3 text-right">
+                            <span class="text-indigo-400 font-medium">{{ item.active_count }}</span>
+                        </td>
+                        <td class="px-5 py-3 text-right">
+                            {% if item.avg_price_sqm %}
+                                {{ "{:,}".format(item.avg_price_sqm).replace(",", " ") }} &#8381;
+                            {% else %}
+                                <span class="text-gray-500">&mdash;</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3">
+                            {% if item.last_run_at %}
+                                {{ item.last_run_at.strftime("%d.%m.%Y %H:%M") }}
+                            {% else %}
+                                <span class="text-gray-500">Не запускался</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3">
+                            {% if item.last_run_status == "success" %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-900 text-green-300">OK</span>
+                            {% elif item.last_run_status == "error" %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-900 text-red-300">Ошибка</span>
+                            {% elif item.last_run_status == "running" %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-900 text-yellow-300">Работает</span>
+                            {% else %}
+                                <span class="text-gray-500">&mdash;</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

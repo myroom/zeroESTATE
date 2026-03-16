@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block title %}{{ latest.project_name or 'Объект' }} - zeroESTATE{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="/properties" class="text-indigo-400 hover:text-indigo-300 text-sm">&larr; Назад к списку</a>
+</div>
+
+{% if latest %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Main info -->
+    <div class="lg:col-span-2 bg-gray-800 rounded-lg shadow p-6">
+        <div class="flex items-start justify-between mb-4">
+            <div>
+                <h2 class="text-2xl font-bold text-white">{{ latest.project_name or 'Без названия' }}</h2>
+                <p class="text-gray-400 mt-1">{{ latest.address or '' }}</p>
+            </div>
+            <span class="text-xs font-medium px-2 py-1 rounded bg-gray-700 text-gray-300">{{ source.name }}</span>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+            <div>
+                <p class="text-xs text-gray-400">Тип</p>
+                <p class="text-white font-medium">{{ latest.property_type or '&mdash;' }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-400">Площадь</p>
+                <p class="text-white font-medium">{% if latest.area %}{{ "%.1f"|format(latest.area) }} м&sup2;{% else %}&mdash;{% endif %}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-400">Этаж</p>
+                <p class="text-white font-medium">{% if latest.floor %}{{ latest.floor }}{% if latest.floor_total %} / {{ latest.floor_total }}{% endif %}{% else %}&mdash;{% endif %}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-400">Метро</p>
+                <p class="text-white font-medium">
+                    {% if latest.metro_station %}{{ latest.metro_station }}
+                        {% if latest.metro_distance_min %}<span class="text-gray-400 text-sm">({{ latest.metro_distance_min }} мин)</span>{% endif %}
+                    {% else %}&mdash;{% endif %}
+                </p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-400">Район</p>
+                <p class="text-white font-medium">{{ latest.district or '&mdash;' }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-400">Отделка</p>
+                <p class="text-white font-medium">{{ latest.finishing or '&mdash;' }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-400">Высота потолков</p>
+                <p class="text-white font-medium">{% if latest.ceiling_height %}{{ latest.ceiling_height }} м{% else %}&mdash;{% endif %}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-400">Срок сдачи</p>
+                <p class="text-white font-medium">{{ latest.completion_date or '&mdash;' }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-400">Статус</p>
+                <p class="text-white font-medium">{{ latest.status or '&mdash;' }}</p>
+            </div>
+        </div>
+
+        {% if latest.property_url %}
+        <div class="mt-6">
+            <a href="{{ latest.property_url }}" target="_blank" rel="noopener"
+               class="text-indigo-400 hover:text-indigo-300 text-sm">Открыть на сайте застройщика &rarr;</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Price card -->
+    <div class="bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-4">Цена</h3>
+        <div class="space-y-4">
+            <div>
+                <p class="text-xs text-gray-400">Стоимость</p>
+                <p class="text-3xl font-bold text-white">
+                    {% if latest.price_value %}
+                        {{ "{:,}".format(latest.price_value).replace(",", " ") }} &#8381;
+                    {% else %}
+                        {{ latest.price or '&mdash;' }}
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-400">Цена за м&sup2;</p>
+                <p class="text-2xl font-bold text-indigo-400">
+                    {% if latest.price_per_sqm %}
+                        {{ "{:,}".format(latest.price_per_sqm).replace(",", " ") }} &#8381;
+                    {% else %}
+                        &mdash;
+                    {% endif %}
+                </p>
+            </div>
+            <div class="pt-2 border-t border-gray-700">
+                <p class="text-xs text-gray-400">Первое появление</p>
+                <p class="text-white">{{ property.first_seen.strftime("%d.%m.%Y") if property.first_seen else '&mdash;' }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-400">Последнее обновление</p>
+                <p class="text-white">{{ property.last_seen.strftime("%d.%m.%Y %H:%M") if property.last_seen else '&mdash;' }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-400">Снимков</p>
+                <p class="text-white">{{ snapshots|length }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Price history chart -->
+<div class="bg-gray-800 rounded-lg shadow p-6 mb-6">
+    <h3 class="text-lg font-semibold mb-4">Динамика цены</h3>
+    <div style="height: 300px;">
+        <canvas id="priceChart"></canvas>
+    </div>
+</div>
+
+<!-- Snapshots table -->
+<div class="bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-700">
+        <h3 class="text-lg font-semibold">История снимков</h3>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-gray-700">
+                    <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Дата</th>
+                    <th class="text-right px-4 py-2.5 text-gray-400 font-medium">Цена</th>
+                    <th class="text-right px-4 py-2.5 text-gray-400 font-medium">Цена/м&sup2;</th>
+                    <th class="text-right px-4 py-2.5 text-gray-400 font-medium">Площадь</th>
+                    <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Статус</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+                {% for snap in snapshots|reverse %}
+                <tr class="hover:bg-gray-750">
+                    <td class="px-4 py-2.5 text-gray-300">{{ snap.scraped_at.strftime("%d.%m.%Y %H:%M") }}</td>
+                    <td class="px-4 py-2.5 text-right text-white">
+                        {% if snap.price_value %}{{ "{:,}".format(snap.price_value).replace(",", " ") }} &#8381;{% else %}{{ snap.price or '&mdash;' }}{% endif %}
+                    </td>
+                    <td class="px-4 py-2.5 text-right text-indigo-400">
+                        {% if snap.price_per_sqm %}{{ "{:,}".format(snap.price_per_sqm).replace(",", " ") }} &#8381;{% else %}&mdash;{% endif %}
+                    </td>
+                    <td class="px-4 py-2.5 text-right text-gray-300">
+                        {% if snap.area %}{{ "%.1f"|format(snap.area) }} м&sup2;{% else %}&mdash;{% endif %}
+                    </td>
+                    <td class="px-4 py-2.5 text-gray-300">{{ snap.status or '&mdash;' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="bg-gray-800 rounded-lg shadow p-8 text-center text-gray-500">
+    Данные по объекту отсутствуют
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/properties/{{ property.id }}/price-history')
+        .then(r => r.json())
+        .then(data => {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Цена (руб)',
+                            data: data.prices,
+                            borderColor: '#818cf8',
+                            backgroundColor: 'rgba(129, 140, 248, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'Цена/м\u00b2 (руб)',
+                            data: data.prices_sqm,
+                            borderColor: '#34d399',
+                            backgroundColor: 'rgba(52, 211, 153, 0.1)',
+                            fill: false,
+                            tension: 0.3,
+                            yAxisID: 'y1',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { labels: { color: '#9ca3af' } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#6b7280' }, grid: { color: '#374151' } },
+                        y: {
+                            type: 'linear', position: 'left',
+                            ticks: { color: '#818cf8', callback: v => (v/1e6).toFixed(1) + ' млн' },
+                            grid: { color: '#374151' }
+                        },
+                        y1: {
+                            type: 'linear', position: 'right',
+                            ticks: { color: '#34d399', callback: v => (v/1e3).toFixed(0) + ' тыс' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        });
+});
+</script>
+{% endblock %}

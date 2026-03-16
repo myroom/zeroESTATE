@@ -1,0 +1,152 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: estate
+      POSTGRES_PASSWORD: estate
+      POSTGRES_DB: estate
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U estate"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://estate:estate@db:5432/estate
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-pik:
+    build:
+      context: .
+      dockerfile: scrapers/pik/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-samolet:
+    build:
+      context: .
+      dockerfile: scrapers/samolet/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-mrgroup:
+    build:
+      context: .
+      dockerfile: scrapers/mrgroup/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-fsk:
+    build:
+      context: .
+      dockerfile: scrapers/fsk/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-a101:
+    build:
+      context: .
+      dockerfile: scrapers/a101/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-donstroy:
+    build:
+      context: .
+      dockerfile: scrapers/donstroy/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-level:
+    build:
+      context: .
+      dockerfile: scrapers/level/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-granelle:
+    build:
+      context: .
+      dockerfile: scrapers/granelle/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-sevensuns:
+    build:
+      context: .
+      dockerfile: scrapers/sevensuns/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-brusnika:
+    build:
+      context: .
+      dockerfile: scrapers/brusnika/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-osnova:
+    build:
+      context: .
+      dockerfile: scrapers/osnova/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scraper-lsr:
+    build:
+      context: .
+      dockerfile: scrapers/lsr/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

@@ -1,0 +1,6 @@
+requests
+sqlalchemy
+psycopg2-binary
+croniter
+beautifulsoup4
+lxml
