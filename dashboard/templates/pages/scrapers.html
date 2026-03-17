@@ -7,7 +7,7 @@
 <!-- Scraper cards -->
 <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
     {% for item in scrapers %}
-    <div class="bg-gray-800 rounded-lg shadow p-5">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-white">{{ item.source.name }}</h3>
             <form method="post" action="/scrapers/{{ item.source.id }}/toggle">
@@ -16,29 +16,29 @@
                         Активен
                     </button>
                 {% else %}
-                    <button type="submit" class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-gray-700 text-gray-400 hover:bg-gray-600 transition-colors">
+                    <button type="submit" class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-slate-100 dark:bg-gray-700 text-slate-500 dark:text-gray-400 hover:bg-gray-600 transition-colors">
                         Выключен
                     </button>
                 {% endif %}
             </form>
         </div>
 
-        <div class="text-sm text-gray-400 mb-4 space-y-1">
-            <p>Slug: <span class="text-gray-300">{{ item.source.slug }}</span></p>
+        <div class="text-sm text-slate-500 dark:text-gray-400 mb-4 space-y-1">
+            <p>Slug: <span class="text-slate-600 dark:text-gray-300">{{ item.source.slug }}</span></p>
             <p>URL: <a href="{{ item.source.base_url }}" target="_blank" class="text-indigo-400 hover:text-indigo-300">{{ item.source.base_url }}</a></p>
             {% if item.config %}
             <p>Последний запуск:
                 {% if item.config.last_run_at %}
-                    <span class="text-gray-300">{{ item.config.last_run_at.strftime("%d.%m.%Y %H:%M") }}</span>
+                    <span class="text-slate-600 dark:text-gray-300">{{ item.config.last_run_at.strftime("%d.%m.%Y %H:%M") }}</span>
                 {% else %}
-                    <span class="text-gray-500">Не было</span>
+                    <span class="text-slate-400 dark:text-gray-500">Не было</span>
                 {% endif %}
             </p>
             <p>Следующий запуск:
                 {% if item.config.next_run_at %}
-                    <span class="text-gray-300">{{ item.config.next_run_at.strftime("%d.%m.%Y %H:%M") }}</span>
+                    <span class="text-slate-600 dark:text-gray-300">{{ item.config.next_run_at.strftime("%d.%m.%Y %H:%M") }}</span>
                 {% else %}
-                    <span class="text-gray-500">По расписанию</span>
+                    <span class="text-slate-400 dark:text-gray-500">По расписанию</span>
                 {% endif %}
             </p>
             {% endif %}
@@ -47,14 +47,14 @@
         {% if item.config %}
         <form method="post" action="/scrapers/{{ item.source.id }}/update" class="space-y-3 mb-4">
             <div>
-                <label class="block text-xs text-gray-400 mb-1">Cron-выражение</label>
+                <label class="block text-xs text-slate-500 dark:text-gray-400 mb-1">Cron-выражение</label>
                 <input type="text" name="cron_expression" value="{{ item.config.cron_expression }}"
-                       class="w-full bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-sm text-white">
+                       class="w-full bg-slate-100 dark:bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-sm text-white">
             </div>
             <div>
-                <label class="block text-xs text-gray-400 mb-1">Прокси URL</label>
+                <label class="block text-xs text-slate-500 dark:text-gray-400 mb-1">Прокси URL</label>
                 <input type="text" name="proxy_url" value="{{ item.config.proxy_url or '' }}" placeholder="socks5://..."
-                       class="w-full bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-sm text-white">
+                       class="w-full bg-slate-100 dark:bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-sm text-white">
             </div>
             <div class="flex gap-2">
                 <button type="submit"
@@ -63,7 +63,7 @@
                 </button>
                 <form method="post" action="/scrapers/{{ item.source.id }}/run" class="inline">
                     <button type="submit"
-                            class="bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1.5 rounded transition-colors">
+                            class="bg-slate-100 dark:bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1.5 rounded transition-colors">
                         Запустить сейчас
                     </button>
                 </form>
@@ -73,12 +73,12 @@
 
         <!-- Recent runs -->
         {% if item.recent_runs %}
-        <div class="border-t border-gray-700 pt-3 mt-3">
-            <p class="text-xs text-gray-400 mb-2">Последние запуски</p>
+        <div class="border-t border-slate-200 dark:border-gray-700 pt-3 mt-3">
+            <p class="text-xs text-slate-500 dark:text-gray-400 mb-2">Последние запуски</p>
             <div class="space-y-1 max-h-40 overflow-y-auto">
                 {% for run in item.recent_runs %}
                 <div class="flex items-center justify-between text-xs">
-                    <span class="text-gray-400">{{ run.started_at.strftime("%d.%m %H:%M") }}</span>
+                    <span class="text-slate-500 dark:text-gray-400">{{ run.started_at.strftime("%d.%m %H:%M") }}</span>
                     <div class="flex items-center gap-2">
                         {% if run.status == "success" %}
                             <span class="text-green-400">OK</span>
@@ -87,7 +87,7 @@
                         {% else %}
                             <span class="text-yellow-400">Работает</span>
                         {% endif %}
-                        <span class="text-gray-500">
+                        <span class="text-slate-400 dark:text-gray-500">
                             {{ run.items_scraped }} шт
                             {% if run.items_new %}/ +{{ run.items_new }}{% endif %}
                             {% if run.items_removed %}/ -{{ run.items_removed }}{% endif %}

@@ -5,13 +5,13 @@
 <h2 class="text-2xl font-bold mb-6">Объекты</h2>
 
 <!-- Filters -->
-<div class="bg-gray-800 rounded-lg shadow p-5 mb-6">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5 mb-6">
     <form hx-get="/properties" hx-target="#properties-table" hx-swap="outerHTML" hx-push-url="true"
           class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
 
         <div>
-            <label class="block text-xs text-gray-400 mb-1">Источник</label>
-            <select name="source" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-sm text-white">
+            <label class="block text-xs text-slate-500 dark:text-gray-400 mb-1">Источник</label>
+            <select name="source" class="w-full bg-slate-100 dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm text-slate-800 dark:text-white">
                 <option value="">Все</option>
                 {% for src in all_sources %}
                 <option value="{{ src.slug }}" {% if filters.source == src.slug %}selected{% endif %}>{{ src.name }}</option>
@@ -20,8 +20,8 @@
         </div>
 
         <div>
-            <label class="block text-xs text-gray-400 mb-1">Тип</label>
-            <select name="property_type" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-sm text-white">
+            <label class="block text-xs text-slate-500 dark:text-gray-400 mb-1">Тип</label>
+            <select name="property_type" class="w-full bg-slate-100 dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm text-slate-800 dark:text-white">
                 <option value="">Все</option>
                 {% for t in property_types %}
                 <option value="{{ t }}" {% if filters.property_type == t %}selected{% endif %}>{{ t }}</option>
@@ -30,36 +30,36 @@
         </div>
 
         <div>
-            <label class="block text-xs text-gray-400 mb-1">Площадь от</label>
+            <label class="block text-xs text-slate-500 dark:text-gray-400 mb-1">Площадь от</label>
             <input type="number" name="min_area" value="{{ filters.min_area }}" placeholder="м&sup2;"
-                   class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-sm text-white">
+                   class="w-full bg-slate-100 dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm text-slate-800 dark:text-white">
         </div>
         <div>
-            <label class="block text-xs text-gray-400 mb-1">Площадь до</label>
+            <label class="block text-xs text-slate-500 dark:text-gray-400 mb-1">Площадь до</label>
             <input type="number" name="max_area" value="{{ filters.max_area }}" placeholder="м&sup2;"
-                   class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-sm text-white">
+                   class="w-full bg-slate-100 dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm text-slate-800 dark:text-white">
         </div>
 
         <div>
-            <label class="block text-xs text-gray-400 mb-1">Цена от</label>
+            <label class="block text-xs text-slate-500 dark:text-gray-400 mb-1">Цена от</label>
             <input type="number" name="min_price" value="{{ filters.min_price }}" placeholder="&#8381;"
-                   class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-sm text-white">
+                   class="w-full bg-slate-100 dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm text-slate-800 dark:text-white">
         </div>
         <div>
-            <label class="block text-xs text-gray-400 mb-1">Цена до</label>
+            <label class="block text-xs text-slate-500 dark:text-gray-400 mb-1">Цена до</label>
             <input type="number" name="max_price" value="{{ filters.max_price }}" placeholder="&#8381;"
-                   class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-sm text-white">
+                   class="w-full bg-slate-100 dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm text-slate-800 dark:text-white">
         </div>
 
         <div>
-            <label class="block text-xs text-gray-400 mb-1">Район</label>
+            <label class="block text-xs text-slate-500 dark:text-gray-400 mb-1">Район</label>
             <input type="text" name="district" value="{{ filters.district }}" placeholder="Район"
-                   class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-sm text-white">
+                   class="w-full bg-slate-100 dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm text-slate-800 dark:text-white">
         </div>
         <div>
-            <label class="block text-xs text-gray-400 mb-1">Метро</label>
+            <label class="block text-xs text-slate-500 dark:text-gray-400 mb-1">Метро</label>
             <input type="text" name="metro" value="{{ filters.metro }}" placeholder="Станция"
-                   class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-sm text-white">
+                   class="w-full bg-slate-100 dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm text-slate-800 dark:text-white">
         </div>
 
         <input type="hidden" name="sort" value="{{ sort }}">

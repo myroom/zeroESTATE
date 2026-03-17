@@ -9,54 +9,54 @@
 {% if latest %}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
     <!-- Main info -->
-    <div class="lg:col-span-2 bg-gray-800 rounded-lg shadow p-6">
+    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div class="flex items-start justify-between mb-4">
             <div>
                 <h2 class="text-2xl font-bold text-white">{{ latest.project_name or 'Без названия' }}</h2>
-                <p class="text-gray-400 mt-1">{{ latest.address or '' }}</p>
+                <p class="text-slate-500 dark:text-gray-400 mt-1">{{ latest.address or '' }}</p>
             </div>
-            <span class="text-xs font-medium px-2 py-1 rounded bg-gray-700 text-gray-300">{{ source.name }}</span>
+            <span class="text-xs font-medium px-2 py-1 rounded bg-slate-100 dark:bg-gray-700 text-slate-600 dark:text-gray-300">{{ source.name }}</span>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
             <div>
-                <p class="text-xs text-gray-400">Тип</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Тип</p>
                 <p class="text-white font-medium">{{ latest.property_type or '&mdash;' }}</p>
             </div>
             <div>
-                <p class="text-xs text-gray-400">Площадь</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Площадь</p>
                 <p class="text-white font-medium">{% if latest.area %}{{ "%.1f"|format(latest.area) }} м&sup2;{% else %}&mdash;{% endif %}</p>
             </div>
             <div>
-                <p class="text-xs text-gray-400">Этаж</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Этаж</p>
                 <p class="text-white font-medium">{% if latest.floor %}{{ latest.floor }}{% if latest.floor_total %} / {{ latest.floor_total }}{% endif %}{% else %}&mdash;{% endif %}</p>
             </div>
             <div>
-                <p class="text-xs text-gray-400">Метро</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Метро</p>
                 <p class="text-white font-medium">
                     {% if latest.metro_station %}{{ latest.metro_station }}
-                        {% if latest.metro_distance_min %}<span class="text-gray-400 text-sm">({{ latest.metro_distance_min }} мин)</span>{% endif %}
+                        {% if latest.metro_distance_min %}<span class="text-slate-500 dark:text-gray-400 text-sm">({{ latest.metro_distance_min }} мин)</span>{% endif %}
                     {% else %}&mdash;{% endif %}
                 </p>
             </div>
             <div>
-                <p class="text-xs text-gray-400">Район</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Район</p>
                 <p class="text-white font-medium">{{ latest.district or '&mdash;' }}</p>
             </div>
             <div>
-                <p class="text-xs text-gray-400">Отделка</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Отделка</p>
                 <p class="text-white font-medium">{{ latest.finishing or '&mdash;' }}</p>
             </div>
             <div>
-                <p class="text-xs text-gray-400">Высота потолков</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Высота потолков</p>
                 <p class="text-white font-medium">{% if latest.ceiling_height %}{{ latest.ceiling_height }} м{% else %}&mdash;{% endif %}</p>
             </div>
             <div>
-                <p class="text-xs text-gray-400">Срок сдачи</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Срок сдачи</p>
                 <p class="text-white font-medium">{{ latest.completion_date or '&mdash;' }}</p>
             </div>
             <div>
-                <p class="text-xs text-gray-400">Статус</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Статус</p>
                 <p class="text-white font-medium">{{ latest.status or '&mdash;' }}</p>
             </div>
         </div>
@@ -70,11 +70,11 @@
     </div>
 
     <!-- Price card -->
-    <div class="bg-gray-800 rounded-lg shadow p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 class="text-lg font-semibold mb-4">Цена</h3>
         <div class="space-y-4">
             <div>
-                <p class="text-xs text-gray-400">Стоимость</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Стоимость</p>
                 <p class="text-3xl font-bold text-white">
                     {% if latest.price_value %}
                         {{ "{:,}".format(latest.price_value).replace(",", " ") }} &#8381;
@@ -84,7 +84,7 @@
                 </p>
             </div>
             <div>
-                <p class="text-xs text-gray-400">Цена за м&sup2;</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Цена за м&sup2;</p>
                 <p class="text-2xl font-bold text-indigo-400">
                     {% if latest.price_per_sqm %}
                         {{ "{:,}".format(latest.price_per_sqm).replace(",", " ") }} &#8381;
@@ -93,16 +93,16 @@
                     {% endif %}
                 </p>
             </div>
-            <div class="pt-2 border-t border-gray-700">
-                <p class="text-xs text-gray-400">Первое появление</p>
+            <div class="pt-2 border-t border-slate-200 dark:border-gray-700">
+                <p class="text-xs text-slate-500 dark:text-gray-400">Первое появление</p>
                 <p class="text-white">{{ property.first_seen.strftime("%d.%m.%Y") if property.first_seen else '&mdash;' }}</p>
             </div>
             <div>
-                <p class="text-xs text-gray-400">Последнее обновление</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Последнее обновление</p>
                 <p class="text-white">{{ property.last_seen.strftime("%d.%m.%Y %H:%M") if property.last_seen else '&mdash;' }}</p>
             </div>
             <div>
-                <p class="text-xs text-gray-400">Снимков</p>
+                <p class="text-xs text-slate-500 dark:text-gray-400">Снимков</p>
                 <p class="text-white">{{ snapshots|length }}</p>
             </div>
         </div>
@@ -110,7 +110,7 @@
 </div>
 
 <!-- Price history chart -->
-<div class="bg-gray-800 rounded-lg shadow p-6 mb-6">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
     <h3 class="text-lg font-semibold mb-4">Динамика цены</h3>
     <div style="height: 300px;">
         <canvas id="priceChart"></canvas>
@@ -118,35 +118,35 @@
 </div>
 
 <!-- Snapshots table -->
-<div class="bg-gray-800 rounded-lg shadow overflow-hidden">
-    <div class="px-5 py-4 border-b border-gray-700">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div class="px-5 py-4 border-b border-slate-200 dark:border-gray-700">
         <h3 class="text-lg font-semibold">История снимков</h3>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
-                <tr class="border-b border-gray-700">
-                    <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Дата</th>
-                    <th class="text-right px-4 py-2.5 text-gray-400 font-medium">Цена</th>
-                    <th class="text-right px-4 py-2.5 text-gray-400 font-medium">Цена/м&sup2;</th>
-                    <th class="text-right px-4 py-2.5 text-gray-400 font-medium">Площадь</th>
-                    <th class="text-left px-4 py-2.5 text-gray-400 font-medium">Статус</th>
+                <tr class="border-b border-slate-200 dark:border-gray-700">
+                    <th class="text-left px-4 py-2.5 text-slate-500 dark:text-gray-400 font-medium">Дата</th>
+                    <th class="text-right px-4 py-2.5 text-slate-500 dark:text-gray-400 font-medium">Цена</th>
+                    <th class="text-right px-4 py-2.5 text-slate-500 dark:text-gray-400 font-medium">Цена/м&sup2;</th>
+                    <th class="text-right px-4 py-2.5 text-slate-500 dark:text-gray-400 font-medium">Площадь</th>
+                    <th class="text-left px-4 py-2.5 text-slate-500 dark:text-gray-400 font-medium">Статус</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-700">
+            <tbody class="divide-y divide-slate-200 dark:divide-gray-700">
                 {% for snap in snapshots|reverse %}
-                <tr class="hover:bg-gray-750">
-                    <td class="px-4 py-2.5 text-gray-300">{{ snap.scraped_at.strftime("%d.%m.%Y %H:%M") }}</td>
+                <tr class="hover:bg-slate-50 dark:hover:bg-gray-750">
+                    <td class="px-4 py-2.5 text-slate-600 dark:text-gray-300">{{ snap.scraped_at.strftime("%d.%m.%Y %H:%M") }}</td>
                     <td class="px-4 py-2.5 text-right text-white">
                         {% if snap.price_value %}{{ "{:,}".format(snap.price_value).replace(",", " ") }} &#8381;{% else %}{{ snap.price or '&mdash;' }}{% endif %}
                     </td>
                     <td class="px-4 py-2.5 text-right text-indigo-400">
                         {% if snap.price_per_sqm %}{{ "{:,}".format(snap.price_per_sqm).replace(",", " ") }} &#8381;{% else %}&mdash;{% endif %}
                     </td>
-                    <td class="px-4 py-2.5 text-right text-gray-300">
+                    <td class="px-4 py-2.5 text-right text-slate-600 dark:text-gray-300">
                         {% if snap.area %}{{ "%.1f"|format(snap.area) }} м&sup2;{% else %}&mdash;{% endif %}
                     </td>
-                    <td class="px-4 py-2.5 text-gray-300">{{ snap.status or '&mdash;' }}</td>
+                    <td class="px-4 py-2.5 text-slate-600 dark:text-gray-300">{{ snap.status or '&mdash;' }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -154,7 +154,7 @@
     </div>
 </div>
 {% else %}
-<div class="bg-gray-800 rounded-lg shadow p-8 text-center text-gray-500">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center text-slate-400 dark:text-gray-500">
     Данные по объекту отсутствуют
 </div>
 {% endif %}
