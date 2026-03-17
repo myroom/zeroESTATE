@@ -84,7 +84,21 @@ async def properties_list(
     if source:
         query = query.where(Source.slug == source)
     if property_type:
-        query = query.where(snap.property_type == property_type)
+        # Match all raw types that map to this normalized type
+        from sqlalchemy import or_
+        TYPE_NORMALIZE_FILTER = {
+            "Коммерческое": ["коммерческое"],
+            "Ритейл": ["ритейл"],
+            "Торговое": ["торговое", "Торговое"],
+            "Офис": ["офис", "офисный центр", "Офисное"],
+            "Офис продаж": ["sales_office", "check_in_office"],
+            "Свободного назначения": ["свободного назначения", "Свободного назначения"],
+        }
+        raw_types_for_filter = TYPE_NORMALIZE_FILTER.get(property_type)
+        if raw_types_for_filter:
+            query = query.where(snap.property_type.in_(raw_types_for_filter))
+        else:
+            query = query.where(snap.property_type == property_type)
     if min_area_f is not None:
         query = query.where(snap.area >= min_area_f)
     if max_area_f is not None:
@@ -125,13 +139,33 @@ async def properties_list(
     sources_q = await db.execute(select(Source).order_by(Source.name))
     all_sources = sources_q.scalars().all()
 
-    # Get distinct property types
+    # Get distinct property types (normalized)
+    TYPE_NORMALIZE = {
+        "коммерческое": "Коммерческое",
+        "ритейл": "Ритейл",
+        "торговое": "Торговое",
+        "Торговое": "Торговое",
+        "офис": "Офис",
+        "офисный центр": "Офис",
+        "Офисное": "Офис",
+        "sales_office": "Офис продаж",
+        "check_in_office": "Офис продаж",
+        "свободного назначения": "Свободного назначения",
+    }
     types_q = await db.execute(
         select(PropertySnapshot.property_type)
         .where(PropertySnapshot.property_type != "")
         .distinct()
     )
-    property_types = [r[0] for r in types_q.all()]
+    raw_types = [r[0] for r in types_q.all()]
+    normalized = sorted(set(TYPE_NORMALIZE.get(t, t.capitalize()) for t in raw_types))
+    property_types = normalized
+
+    # Build reverse map: normalized type -> list of raw types
+    type_reverse = {}
+    for raw_t in raw_types:
+        norm = TYPE_NORMALIZE.get(raw_t, raw_t.capitalize())
+        type_reverse.setdefault(norm, []).append(raw_t)
 
     items = []
     for prop, snapshot, src in rows:
