@@ -23,6 +23,7 @@ SOURCES_SEED = [
     {"slug": "brusnika", "name": "Брусника", "base_url": "https://moskva.brusnika.ru"},
     {"slug": "osnova", "name": "ГК ОСНОВА", "base_url": "https://gk-osnova.ru"},
     {"slug": "lsr", "name": "Группа ЛСР", "base_url": "https://www.lsr.ru"},
+    {"slug": "trade_estate", "name": "Основа Trade Estate", "base_url": "https://trade-estate.ru"},
 ]
 
 

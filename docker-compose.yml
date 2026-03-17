@@ -138,6 +138,16 @@ services:
       db:
         condition: service_healthy
 
+  scraper-trade-estate:
+    build:
+      context: .
+      dockerfile: scrapers/trade_estate/Dockerfile
+    environment:
+      DATABASE_URL_SYNC: postgresql://estate:estate@db:5432/estate
+    depends_on:
+      db:
+        condition: service_healthy
+
   scraper-lsr:
     build:
       context: .

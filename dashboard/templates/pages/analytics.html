@@ -103,13 +103,16 @@
 {% block scripts %}
 <script>
 const COLORS = ['#818cf8','#34d399','#fbbf24','#f87171','#a78bfa','#fb923c','#38bdf8','#e879f9','#4ade80','#f472b6'];
+const isDark = document.documentElement.classList.contains('dark');
+const textColor = isDark ? '#9ca3af' : '#475569';
+const gridColor = isDark ? '#374151' : '#e2e8f0';
 const chartDefaults = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { labels: { color: '#9ca3af' } } },
+    plugins: { legend: { labels: { color: textColor } } },
     scales: {
-        x: { ticks: { color: '#6b7280' }, grid: { color: '#374151' } },
-        y: { ticks: { color: '#6b7280' }, grid: { color: '#374151' } }
+        x: { ticks: { color: textColor }, grid: { color: gridColor } },
+        y: { ticks: { color: textColor }, grid: { color: gridColor } }
     }
 };
 
@@ -177,7 +180,7 @@ fetch('/api/analytics/by-type').then(r=>r.json()).then(data => {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'right', labels: { color: '#9ca3af' } } }
+            plugins: { legend: { position: 'right', labels: { color: textColor } } }
         }
     });
 });
@@ -199,6 +202,10 @@ fetch('/api/analytics/new-removed-trend').then(r=>r.json()).then(data => {
 
 // By district
 fetch('/api/analytics/by-district').then(r=>r.json()).then(data => {
+    if (!data.labels.length) {
+        document.getElementById('byDistrictChart').parentElement.innerHTML = '<p class="text-slate-400 dark:text-gray-500 text-center py-16">Нет данных по районам</p>';
+        return;
+    }
     new Chart(document.getElementById('byDistrictChart').getContext('2d'), {
         type: 'bar',
         data: {
@@ -206,9 +213,13 @@ fetch('/api/analytics/by-district').then(r=>r.json()).then(data => {
             datasets: [{ label: 'Объектов', data: data.values, backgroundColor: '#818cf8' }]
         },
         options: {
-            ...chartDefaults,
+            responsive: true, maintainAspectRatio: false,
             indexAxis: 'y',
-            plugins: { ...chartDefaults.plugins, legend: { display: false } }
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true },
+                y: { ticks: { color: textColor }, grid: { color: gridColor } }
+            }
         }
     });
 });
@@ -222,9 +233,13 @@ fetch('/api/analytics/by-metro').then(r=>r.json()).then(data => {
             datasets: [{ label: 'Объектов', data: data.values, backgroundColor: '#38bdf8' }]
         },
         options: {
-            ...chartDefaults,
+            responsive: true, maintainAspectRatio: false,
             indexAxis: 'y',
-            plugins: { ...chartDefaults.plugins, legend: { display: false } }
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true },
+                y: { ticks: { color: textColor, font: { size: 11 } }, grid: { color: gridColor } }
+            }
         }
     });
 });

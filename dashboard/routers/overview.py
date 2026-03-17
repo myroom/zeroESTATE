@@ -27,6 +27,7 @@ SCRAPER_METHODS = {
     "samolet": "Playwright (нужен прокси)",
     "mrgroup": "Playwright (нужен прокси)",
     "sevensuns": "Playwright (нужен прокси)",
+    "trade_estate": "Playwright",
 }
 
 
