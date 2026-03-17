@@ -1,4 +1,5 @@
-requests
+playwright
+playwright-stealth
 sqlalchemy
 psycopg2-binary
 croniter
