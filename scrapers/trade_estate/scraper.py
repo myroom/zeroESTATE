@@ -25,7 +25,7 @@ class TradeEstateScraper(BrowserScraper):
     name = "Основа Trade Estate"
     base_url = "https://trade-estate.ru/sale/"
 
-    CARD_SELECTOR = ".product__card.page-element"
+    CARD_SELECTOR = ".product__card"
 
     def scrape_with_browser(self, page: Page, browser: Browser) -> list[dict]:
         all_items = []
@@ -35,27 +35,39 @@ class TradeEstateScraper(BrowserScraper):
         page.goto(self.base_url, wait_until="domcontentloaded", timeout=60000)
         time.sleep(random.uniform(2, 4))
 
-        # Wait for project cards
+        # Wait for catalog to load (Bitrix renders asynchronously)
         try:
-            page.wait_for_selector(self.CARD_SELECTOR, timeout=30000)
-            self.logger.info("Project cards detected on listing page")
+            page.wait_for_function("document.body.innerText.includes('найдено')", timeout=30000)
+            self.logger.info("Catalog loaded (found 'найдено' text)")
         except Exception:
-            self.logger.warning("Could not find project cards with primary selector, trying fallback")
+            self.logger.warning("Catalog text not found, waiting extra time...")
+            time.sleep(10)
+
+        # Scroll to trigger lazy loading
+        for _ in range(5):
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            time.sleep(1.5)
+        page.evaluate("window.scrollTo(0, 0)")
+        time.sleep(2)
 
         # Check for anti-bot
         if self._detect_anti_bot(page):
             from scrapers.browser_scraper import _AntiBotDetected
             raise _AntiBotDetected("Anti-bot detected on listing page")
 
+        # Debug: log page info
+        debug_info = page.evaluate("() => ({title: document.title, url: location.href, bodyLen: document.body.innerText.length, allLinks: document.querySelectorAll('a[href*=\"/sale/\"]').length})")
+        self.logger.info(f"Page: {debug_info}")
+
         # Extract project card data from listing page
         projects = page.evaluate("""() => {
-            const cards = document.querySelectorAll('.product__card.page-element');
+            const cards = document.querySelectorAll('.product__card');
             const results = [];
 
             cards.forEach(card => {
                 try {
-                    // Project link
-                    const linkEl = card.tagName === 'A' ? card : card.querySelector('a[href*="/sale/"]');
+                    // Project link - inside a.product__title or a.product__image
+                    const linkEl = card.querySelector('a.product__title') || card.querySelector('a.product__image') || card.querySelector('a[href*="/sale/"]');
                     if (!linkEl) return;
                     const href = linkEl.href || '';
                     if (!href || !href.includes('/sale/')) return;
