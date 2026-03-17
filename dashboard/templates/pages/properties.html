@@ -12,7 +12,6 @@
         <div>
             <label class="block text-xs text-gray-400 mb-1">Источник</label>
             <select name="source" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-sm text-white"
-                    hx-get="/properties" hx-target="#properties-table" hx-swap="outerHTML" hx-include="closest form">
                 <option value="">Все</option>
                 {% for src in all_sources %}
                 <option value="{{ src.slug }}" {% if filters.source == src.slug %}selected{% endif %}>{{ src.name }}</option>
@@ -23,7 +22,6 @@
         <div>
             <label class="block text-xs text-gray-400 mb-1">Тип</label>
             <select name="property_type" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-sm text-white"
-                    hx-get="/properties" hx-target="#properties-table" hx-swap="outerHTML" hx-include="closest form">
                 <option value="">Все</option>
                 {% for t in property_types %}
                 <option value="{{ t }}" {% if filters.property_type == t %}selected{% endif %}>{{ t }}</option>

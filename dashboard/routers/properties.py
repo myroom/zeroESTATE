@@ -24,16 +24,41 @@ async def properties_list(
     db: AsyncSession = Depends(get_db),
     source: Optional[str] = Query(None),
     property_type: Optional[str] = Query(None),
-    min_area: Optional[float] = Query(None),
-    max_area: Optional[float] = Query(None),
-    min_price: Optional[int] = Query(None),
-    max_price: Optional[int] = Query(None),
+    min_area: Optional[str] = Query(None),
+    max_area: Optional[str] = Query(None),
+    min_price: Optional[str] = Query(None),
+    max_price: Optional[str] = Query(None),
     district: Optional[str] = Query(None),
     metro: Optional[str] = Query(None),
     sort: str = Query("price_per_sqm"),
     order: str = Query("asc"),
     page: int = Query(1, ge=1),
 ):
+    # Convert empty strings to None, parse numbers
+    def _float(v):
+        if not v or not v.strip():
+            return None
+        try:
+            return float(v)
+        except ValueError:
+            return None
+
+    def _int(v):
+        if not v or not v.strip():
+            return None
+        try:
+            return int(v)
+        except ValueError:
+            return None
+
+    min_area_f = _float(min_area)
+    max_area_f = _float(max_area)
+    min_price_i = _int(min_price)
+    max_price_i = _int(max_price)
+    source = source if source else None
+    property_type = property_type if property_type else None
+    district = district if district and district.strip() else None
+    metro = metro if metro and metro.strip() else None
     # Subquery: latest snapshot per property
     latest_snap = (
         select(
@@ -60,14 +85,14 @@ async def properties_list(
         query = query.where(Source.slug == source)
     if property_type:
         query = query.where(snap.property_type == property_type)
-    if min_area is not None:
-        query = query.where(snap.area >= min_area)
-    if max_area is not None:
-        query = query.where(snap.area <= max_area)
-    if min_price is not None:
-        query = query.where(snap.price_value >= min_price)
-    if max_price is not None:
-        query = query.where(snap.price_value <= max_price)
+    if min_area_f is not None:
+        query = query.where(snap.area >= min_area_f)
+    if max_area_f is not None:
+        query = query.where(snap.area <= max_area_f)
+    if min_price_i is not None:
+        query = query.where(snap.price_value >= min_price_i)
+    if max_price_i is not None:
+        query = query.where(snap.price_value <= max_price_i)
     if district:
         query = query.where(snap.district.ilike(f"%{district}%"))
     if metro:
@@ -133,6 +158,12 @@ async def properties_list(
             "max_price": max_price or "",
             "district": district or "",
             "metro": metro or "",
+        },
+        "filters_clean": {
+            "min_area": min_area_f,
+            "max_area": max_area_f,
+            "min_price": min_price_i,
+            "max_price": max_price_i,
         },
         "sort": sort,
         "order": order,
